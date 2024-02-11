@@ -1,0 +1,168 @@
+= disks(1)
+:disko: link:https://github.com/nix-community/disko
+:idprefix:
+:idseparator: -
+:naho: link:https://github.com/trueNAHO
+:os: link:https://github.com/trueNAHO/os
+:preparing-the-disk: link:https://wiki.archlinux.org/title/Data-at-rest_encryption#Preparing_the_disk
+:repository-path: trueNAHO/disks
+:repository-star-history-align: center
+:repository-star-history-alt: Star History Chart
+:repository-star-history-width: 100%
+:shred: link:https://wiki.archlinux.org/title/Securely_wipe_disk#shred
+:toc:
+
+:repository-flake-url: github:{repository-path}
+:repository-star-history-src-dark: https://api.star-history.com/svg?repos={repository-path}&type=Date&theme=dark
+:repository-star-history-src-light: https://api.star-history.com/svg?repos={repository-path}&type=Date
+:repository-raw: https://github.com/{repository-path}
+
+:repository: link:{repository-raw}
+:repository-raw-stargazers: {repository-raw}/stargazers
+
+== Name
+
+disks - NAHO's disks
+
+== Description
+
+{naho}[NAHO]'s disks managed with {disko}[_disko_].
+
+== Packages
+
+[cols="1,100"]
+|===
+| Package | Description
+
+| [[disko-package]] `disko`
+| Wraps and locks the {disko}[_disko_] input in an environment providing the
+  `disks` and `lib` directories to the underlying `disko` command.
+
+| [[default-package]] `default`
+| Defaults to the <<disko-package, `disko`>> package.
+
+| [[format-package]] `format`
+| Wraps the <<disko-package, `disko`>> package for formatting disks by setting
+  {disko}[_disko_]'s `--mode disko` flag and prompting for the password file.
+
+| [[mount-package]] `mount`
+| Wraps the <<disko-package, `disko`>> package for mounting disks by setting
+  {disko}[_disko_]'s `--mode mount` flag and prompting for the password file.
+
+| [[shred-package]] `shred`
+| Wraps the {shred}[`shred`] command for {preparing-the-disk}[securely wiping
+  disks] by setting the `--verbose` flag and defaulting the number of iterations
+  and the random source to `1` and `/dev/urandom` respectively.
+|===
+
+== Usage
+
+The following table explains the possible variables used to <<mount-package,
+mount>> and <<format-package, format>> disks:
+
+|===
+| Variable | Description | Example
+
+a| `<BACKUP_MOUNTPOINT>`
+a| Mountpoint for the `/backup` subvolume.
+a| `/mnt/backup`
+
+a| [[variable-device]] `<DEVICE>`
+| Path to the disk device.
+a| `/dev/sda`
+
+a| `<ROOT_MOUNTPOINT>`
+a| Mountpoint for the `/root` subvolume.
+a| `/mnt/root`
+|===
+
+The following table demonstrates how to <<mount-package, mount>> and
+<<format-package, format>> disks:
+
+[cols="2,4,4",subs="attributes"]
+|===
+| Disk | <<mount-package, Mount>> | <<format-package, Format>>
+
+a|
+
+link:disks/SanDisk_Extreme_55AE_323230354C37343031383735.nix[
+`SanDisk_Extreme_55AE_323230354C37343031383735`]
+
+a|
+
+[,bash]
+----
+nix \
+  --experimental-features "flakes nix-command" \
+  run \
+  github:trueNAHO/disks#mount \
+  -- \
+  --argstr backupMountpoint <BACKUP_MOUNTPOINT> \
+  --argstr device <DEVICE> \
+  --argstr rootMountpoint <ROOT_MOUNTPOINT> \
+  --root-mountpoint / \
+  disks/SanDisk_Extreme_55AE_323230354C37343031383735.nix
+----
+
+a|
+
+[,bash]
+----
+nix \
+  --experimental-features "flakes nix-command" \
+  run \
+  github:trueNAHO/disks#format \
+  -- \
+  --argstr backupMountpoint <BACKUP_MOUNTPOINT> \
+  --argstr device <DEVICE> \
+  --argstr rootMountpoint <ROOT_MOUNTPOINT> \
+  --root-mountpoint / \
+  disks/SanDisk_Extreme_55AE_323230354C37343031383735.nix
+----
+|===
+
+== Add Disk
+
+To add a new disk, add the new {disko}[_disko_] configuration to the
+`disks/<DISKO>.nix` file, where `<DISKO>` is the output of the following command
+and <<variable-device, `<FILE>` corresponds to the path of the disk device>>:
+
+[,bash]
+----
+udevadm info --name <FILE> --property ID_SERIAL --query property --value |
+  sed 's/-[[:digit:]]*:[[:digit:]]*$//'
+----
+
+== See Also
+
+{repository-star-history-src-dark}[GitHub Star History], link:LICENSE[License],
+{os}[NAHO's NixOS configurations],
+link:docs/code_of_conduct.adoc[disks.code-of-conduct(7)],
+link:docs/contributing.adoc[disks.contributing(7)]
+
+ifdef::env-github[]
+[subs=attributes]
+++++
+<a href="{repository-raw-stargazers}">
+  <p align="{repository-star-history-align}">
+    <picture>
+      <source
+        media="(prefers-color-scheme: dark)"
+        srcset="{repository-star-history-src-dark}"
+      />
+
+      <source
+        media="(prefers-color-scheme: light)"
+        srcset="{repository-star-history-src-light}"
+      />
+
+      <img
+        alt="{repository-star-history-alt}"
+        src="{repository-star-history-src-dark}"
+        width="{repository-star-history-width}"
+      />
+    </picture>
+  </p>
+</a>
+++++
+endif::[]
