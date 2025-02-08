@@ -22,4 +22,4 @@ jobs:
       - uses: DeterminateSystems/update-flake-lock@v21
         with:
           pr-labels: dependencies
-          pr-title: "feat(flake): update all inputs"
+          pr-title: "flake: inputs: update all"
