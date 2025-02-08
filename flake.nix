@@ -11,12 +11,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     preCommitHooks = {
-      inputs = {
-        flake-utils.follows = "flakeUtils";
-        nixpkgs-stable.follows = "preCommitHooks/nixpkgs";
-        nixpkgs.follows = "nixpkgs";
-      };
-
+      inputs.nixpkgs.follows = "nixpkgs";
       url = "github:cachix/pre-commit-hooks.nix";
     };
   };
@@ -39,12 +34,15 @@
           // {
             preCommitHooks = inputs.preCommitHooks.lib.${system}.run {
               hooks = {
-                alejandra.enable = true;
+                alejandra = {
+                  enable = true;
+                  settings.verbosity = "quiet";
+                };
+
                 typos.enable = true;
                 yamllint.enable = true;
               };
 
-              settings.alejandra.verbosity = "quiet";
               src = ./.;
             };
           };
