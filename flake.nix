@@ -1,5 +1,5 @@
 {
-  description = "NAHO's disks managed with 'disko'";
+  description = "NAHO's disks managed with disko";
 
   inputs = {
     disko = {
